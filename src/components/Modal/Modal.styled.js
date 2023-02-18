@@ -14,4 +14,6 @@ export const ModalWindow = styled.div`
   height: 200px;
 `;
 
-export const StyledButton = styled.button``;
+export const StyledButton = styled.button`
+  border: none;
+`;

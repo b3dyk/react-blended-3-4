@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { deleteUser, fetchUserDetails } from 'redux/users/users.operations';
+import { fetchUserDetails } from 'redux/users/users.operations';
 import { selectUserDetails } from 'redux/users/users.selector';
 
 const UserDetailsPage = () => {
