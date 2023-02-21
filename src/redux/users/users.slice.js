@@ -1,5 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { deleteUser, fetchUserDetails, fetchUsers } from './users.operations';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+
+import {
+  addUser,
+  deleteUser,
+  editUser,
+  fetchUserDetails,
+  fetchUsers,
+} from './users.operations';
 
 const usersSlice = createSlice({
   name: 'users',
@@ -10,48 +17,66 @@ const usersSlice = createSlice({
     currentUser: null,
   },
 
-  reducers: {},
-
   extraReducers: builder =>
     builder
-      .addCase(fetchUsers.pending, state => {
-        state.isLoading = true;
-      })
+
       .addCase(fetchUsers.fulfilled, (state, { payload }) => {
-        state.isLoading = false;
         state.items = payload;
-        state.error = null;
         state.currentUser = null;
       })
-      .addCase(fetchUsers.rejected, (state, { payload }) => {
-        state.isLoading = false;
-        state.error = payload;
-      })
-      .addCase(fetchUserDetails.pending, state => {
-        state.isLoading = true;
-      })
+
       .addCase(fetchUserDetails.fulfilled, (state, { payload }) => {
-        state.isLoading = false;
-        state.error = null;
         state.currentUser = payload;
       })
-      .addCase(fetchUserDetails.rejected, (state, { payload }) => {
-        state.error = payload;
-        state.isLoading = false;
-      })
-      .addCase(deleteUser.pending, state => {
-        state.isLoading = true;
-      })
       .addCase(deleteUser.fulfilled, (state, { payload }) => {
-        state.isLoading = false;
-        state.error = null;
         state.items = state.items.filter(user => user.id !== payload.id);
         state.currentUser = null;
       })
-      .addCase(deleteUser.rejected, (state, { payload }) => {
-        state.error = payload;
-        state.isLoading = false;
-      }),
+      .addCase(addUser.fulfilled, (state, { payload }) => {
+        state.items = [...state.items, payload];
+        state.currentUser = payload;
+      })
+      .addCase(editUser.fulfilled, (state, { payload }) => {
+        const idx = state.items.findIndex(user => user.id === payload.id);
+        state.items[idx] = payload;
+        state.currentUser = payload;
+      })
+      .addMatcher(
+        isAnyOf(
+          fetchUsers.pending,
+          addUser.pending,
+          deleteUser.pending,
+          editUser.pending
+        ),
+        state => {
+          state.isLoading = true;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchUsers.rejected,
+          addUser.rejected,
+          deleteUser.rejected,
+          editUser.rejected
+        ),
+        (state, { payload }) => {
+          state.error = payload;
+          state.isLoading = false;
+          state.currentUser = null;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchUsers.fulfilled,
+          addUser.fulfilled,
+          deleteUser.fulfilled,
+          editUser.fulfilled
+        ),
+        state => {
+          state.isLoading = false;
+          state.error = null;
+        }
+      ),
 });
 
 export const usersReducer = usersSlice.reducer;

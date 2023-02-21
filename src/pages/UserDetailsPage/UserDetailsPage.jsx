@@ -32,6 +32,9 @@ const UserDetailsPage = () => {
       <button type="button" onClick={() => setIsModalShown(true)}>
         Delete
       </button>
+      <Link to={`/users/update/${id}`} state={user}>
+        Update
+      </Link>
       {isModalShown && <Modal clickClose={setIsModalShown} id={id} />}
     </>
   );
